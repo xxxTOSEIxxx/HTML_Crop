@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+        #canvas, #out {
+            background-color: RGB(200,200,200);
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <div><input type="file" name="file" id="file"></div>
+    <input id='scal' type='range' value='' min='10' max='400' oninput="scaling(value)" style='width: 300px;'><br>
+    <canvas id='canvas' width='300' height='400'></canvas>
+    <div><button onclick='crop_img()'>CROP</button></div>
+    <canvas id='out' width='200' height='200'></canvas>    
+</body>
+</html>
+
+<script>
+const file = document.getElementById('file');
+const canvas = document.getElementById('canvas');
+const out = document.getElementById('out');
+const img = new Image();
+let uploadImgSrc;
+
+let ix = 0;
+let iy = 0;
+let v = 1.0;
+
+let mouse_down = false;
+let sx = 0;
+let sy = 0;
+
+canvasDraw(0,0);
+crop_img();
+
+
+//------------------------------------------------
+// 画像切り取り
+//------------------------------------------------
+function crop_img()
+{
+    const ctx = out.getContext('2d');
+    ctx.fillStyle = 'rgb(200, 200, 200)';
+    ctx.fillRect( 0, 0, out.width, out.height );
+    ctx.drawImage( img, 0, 0, img.width, img.height, ((out.width / 2) - ix * v), ((out.width / 2) - iy * v), (img.width * v), (img.height * v),);
+}
+
+
+//------------------------------------------------
+// 指定された画像ファイルを読込む
+//------------------------------------------------
+function loadLocalImage(e)
+{
+    // 選択された画像を取得
+    let fileData = e.target.files[0];
+
+    // 画像ファイルなのかチェックを行う
+    if (!fileData.type.match('image.*'))
+    {
+        alert('画像を選択してください');
+        return;
+    }
+
+    // FileReaderオブジェクトを使用してファイルを読込む
+    let reader = new FileReader();
+    reader.onload = function()
+    {
+        uploadImgSrc = reader.result;
+        img.src = uploadImgSrc;
+    }
+
+    reader.readAsDataURL(fileData);
+}
+
+//------------------------------------------------
+// 画像が読込まれた場合
+//------------------------------------------------
+img.onload = function()
+{
+    let scl = 0;
+
+    // 画像の中心を求める
+    ix = img.width / 2;
+    iy = img.height / 2;
+
+    // スケールを算出
+    scl = parseInt(canvas.width / img.width * 100);
+    document.getElementById('scal').value = scl;
+    scaling(scl);
+}
+
+
+//------------------------------------------------
+// スライダーが変化した場合
+//------------------------------------------------
+function scaling(_scl)
+{
+    v = parseInt(_scl) * 0.01;
+    canvasDraw( ix, iy);
+}
+
+
+//------------------------------------------------
+// ファイルが指定された時、loadLocalImage()を実行
+//------------------------------------------------
+file.addEventListener('change', loadLocalImage, false);
+
+
+//------------------------------------------------
+// Canvasに画像を表示
+//------------------------------------------------
+function canvasDraw(_ix, _iy)
+{
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'rgb(200, 200, 200)';
+    ctx.fillRect( 0, 0, canvas.width, canvas.height );
+    ctx.drawImage( img, 0, 0, img.width, img.height, ((canvas.width/2)-_ix * v), ((canvas.height/2)-_iy*v), (img.width * v), (img.height * v),);
+
+    // 切り取り領域を示す枠
+    ctx.strokeStyle = 'rgba(200, 0, 0, 0.8)';
+    ctx.strokeRect( ((canvas.width - out.width) / 2), ((canvas.height - out.height) / 2), out.width, out.height );
+}
+
+
+//------------------------------------------------
+// ドラッグ開始
+//------------------------------------------------
+canvas.ontouchstart = canvas.onmousedown = function(_event)
+{
+    mouse_down = true;
+    sx = _event.pageX;
+    sy = _event.pageY;
+
+    return false;
+}
+
+
+//------------------------------------------------
+// ドラッグ終了
+//------------------------------------------------
+canvas.ontouchend = canvas.onmouseout = canvas.onmouseup = function(_event)
+{
+    // ドラッグ開始していない場合
+    if (mouse_down == false) return false;
+
+    mouse_down = false;
+    canvasDraw( (ix += (sx - _event.pageX) / v), (iy += (sy - _event.pageY) / v));
+
+    return false;
+}
+
+
+//------------------------------------------------
+// ドラッグ中
+//------------------------------------------------
+canvas.ontouchmove = canvas.onmousemove = function(_event)
+{
+    // ドラッグ開始していない場合
+    if (mouse_down == false) return false;
+
+    canvasDraw( (ix + (sx - _event.pageX) / v), (iy + (sy - _event.pageY) / v));
+
+    return false;
+}
+
+
+
+//------------------------------------------------
+// マウスホイールで拡大・縮小
+//------------------------------------------------
+canvas.onmousewheel = function(_event)
+{
+    let scl = parseInt( parseInt( document.getElementById( 'scal' ).value ) + _event.wheelDelta * 0.05 );
+    if ( scl < 10  ) scl = 10;
+    if ( scl > 400 ) scl = 400;
+    document.getElementById( 'scal' ).value = scl;
+    scaling( scl );
+
+    return false;
+}
+
+
+
+</script>
