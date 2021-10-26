@@ -125,7 +125,6 @@ function canvasDraw(_ix, _iy)
     ctx.strokeRect( ((canvas.width - out.width) / 2), ((canvas.height - out.height) / 2), out.width, out.height );
 }
 
-
 //------------------------------------------------
 // ドラッグ開始
 //------------------------------------------------
@@ -183,6 +182,49 @@ canvas.onmousewheel = function(_event)
     return false;
 }
 
+
+//------------------------------------------------
+// キャンバス上でドラッグ中
+//------------------------------------------------
+canvas.ondragover = function(_event)
+{
+    // マウスダウンがtrueの場合、キャンバス上でマウスボタンを押しているので、ファイルをドラッグしていない事になる
+    if (mouse_down == true) return false;
+
+    // ドロップイベントを受け取れるようにする
+    _event.preventDefault();
+}
+
+
+//------------------------------------------------
+// キャンバス上でファイルをドロップした場合
+//------------------------------------------------
+canvas.ondrop = function(_event)
+{
+    _event.preventDefault();
+
+    // ドラックアンドドロップしたファイルをセット
+    let fileData = _event.dataTransfer.files[0];
+    
+    // input type="file"の値を変更することはできないので...
+    // 画像ファイルなのかチェックを行う
+    if (!fileData.type.match('image.*'))
+    {
+        alert('画像を選択してください');
+        return;
+    }
+
+    // FileReaderオブジェクトを使用してファイルを読込む
+    let reader = new FileReader();
+    reader.onload = function()
+    {
+        uploadImgSrc = reader.result;
+        img.src = uploadImgSrc;
+    }
+
+    reader.readAsDataURL(fileData);
+
+}
 
 
 </script>

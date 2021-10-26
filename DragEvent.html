@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+  <link rel="stylesheet" href="DragEvent.css" />
+
+  <script type="text/javascript">
+    var outputTextBox;
+    function onload() {
+      outputTextBox = document.getElementById('outputText');
+      
+      var elem = document.getElementById('DragItem');
+      elem.addEventListener('dragstart', onDragStart, false);
+      elem.addEventListener('dragenter', onDragEnter, false);
+      elem.addEventListener('dragover', onDragOver, false);
+      elem.addEventListener('dragleave', onDragLeave, false);
+      elem.addEventListener('drop', onDragDrop, false);
+      elem.addEventListener('dragend', onDragEnd, false);
+
+      var zone = document.getElementById('DropItem');
+      zone.addEventListener('dragstart', onTargetDragStart, false);
+      zone.addEventListener('dragenter', onTargetDragEnter, false);
+      zone.addEventListener('dragover', onTargetDragOver, false);
+      zone.addEventListener('dragleave', onTargetDragLeave, false);
+      zone.addEventListener('drop', onTargetDragDrop, false);
+      zone.addEventListener('dragend', onTargetDragEnd, false);
+   }
+
+    function onDragStart(e) {
+      outputTextBox.value = outputTextBox.value+"DragItem : dragstart\r\n";
+    }
+
+    function onDragEnter(e) {
+      outputTextBox.value = outputTextBox.value +"DragItem : dragenter\r\n";
+    }
+
+    function onDragOver(e) {
+      outputTextBox.value = outputTextBox.value +"DragItem : dragover\r\n";
+    }
+
+    function onDragLeave(e) {
+      outputTextBox.value = outputTextBox.value +"DragItem : dragleave\r\n";
+    }
+
+    function onDragDrop(e) {
+      outputTextBox.value = outputTextBox.value +"DragItem : drop\r\n";
+   }
+
+    function onDragEnd(e) {
+      outputTextBox.value = outputTextBox.value + "DragItem : dragend\r\n";
+    }
+
+    function onTargetDragStart(e) {
+      outputTextBox.value = outputTextBox.value + "DropZone : dragenter\r\n";
+    }
+
+    function onTargetDragEnter(e) {
+      outputTextBox.value = outputTextBox.value + "DropZone : dragover\r\n";
+    }
+
+    function onTargetDragOver(e) {
+      e.preventDefault();
+      outputTextBox.value = outputTextBox.value + "DropZone : dragover\r\n";
+    }
+
+    function onTargetDragLeave(e) {
+      outputTextBox.value = outputTextBox.value + "DropZone : dragleave\r\n";
+    }
+
+    function onTargetDragDrop(e) {
+      e.preventDefault();
+      outputTextBox.value = outputTextBox.value +"DropZone : drop\r\n";
+    }
+
+    function onTargetDragEnd(e) {
+      outputTextBox.value = outputTextBox.value + "DropZone : end\r\n";
+    }
+  </script>
+</head>
+<body onload="onload();">
+  <div id="DragItem" draggable="true">ドラッグ要素です</div>
+
+  <hr />
+  <div id="DropItem">ドロップ枠です</div>
+
+  <hr />
+  <textarea id="outputText"></textarea> 
+</body>
+</html>

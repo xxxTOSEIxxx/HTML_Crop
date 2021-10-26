@@ -1,0 +1,17 @@
+#DragItem{
+    width:180px;
+    border: 1px solid #ff6a00
+}
+
+#DropItem {
+    margin:32px 0 32px 0;
+    width:360px;
+    height:200px;
+    border: 1px solid #808080;
+    background-color:#f3f3f3;
+}
+
+#outputText{
+    width:680px;
+    height:240px;
+}
